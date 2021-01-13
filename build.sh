@@ -1,0 +1,1 @@
+go build -ldflags "-X 'main.commsFromFile=$(./prepare.commands.sh)' -X 'main.buildTime=$(date +%Y.%m.%d_%H:%M:%S)'" -o cli cli.go && ./cli

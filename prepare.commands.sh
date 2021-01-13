@@ -1,0 +1,1 @@
+cat commands.sh | sed -e "s/'/_____single-tick_____/g"
