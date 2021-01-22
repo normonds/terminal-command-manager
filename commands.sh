@@ -68,6 +68,10 @@ systemctl status <prompt:service name:cron>
 # chmod info
 echo "7:rwx,6:rw-,5:r-x,4:r--,3:-wx,2:-w-,1:--x,0---"
 
+#imagemagick resize pngs to out folder
+mogrify -monitor -path out -resize 33% -format png *.png
+#imagemagick convert jpgs to pngs imgs
+mogrify -format png *.jpg
 # ip info url request
 curl https://ifconfig.co
 # ipjson info url request
