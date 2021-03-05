@@ -107,7 +107,10 @@ func parseCommand(command string) {
 		for i := 0; i < len(promptArr); i++ {
 			stri = strings.Trim(promptArr[i], "<>")
 			strSplit = strings.Split(stri, ":")
+			out = ""
+			read = ""
 
+			//fmt.Print(len(strSplit))
 			fmt.Print(strSplit[1])
 			if len(strSplit) > 2 {
 				fmt.Print(" (" + strSplit[2] + ")")
@@ -119,6 +122,7 @@ func parseCommand(command string) {
 			} else {
 				out = read
 			}
+			//fmt.Println(promptArr[i], out)
 			command = strings.Replace(command, promptArr[i], out, -1)
 			//fmt.Print(first)
 		}
