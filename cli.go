@@ -18,6 +18,7 @@ import (
 var args []string
 var buildTime string
 var commsFromFile string
+var scripts string
 var textView = tview.NewTextView()
 var app = tview.NewApplication()
 var list = tview.NewList()
@@ -207,8 +208,33 @@ func searchRender(search string) {
 func main() {
 
 	removedNewLines := strings.Replace(commsFromFile, "\r\n", "\n", -1)
+
 	replacedTicks := strings.Replace(removedNewLines, "_____single-tick_____", "'", -1)
 	comms = linesToCommands(strings.Split(replacedTicks, "\n"))
+
+	scriptLines := strings.Replace(scripts, "_____single-tick_____", "'", -1)
+	rege := regexp.MustCompile("#!/(usr/bin|bin)/bash")
+	split := rege.Split(scriptLines, -1)
+	if (strings.Trim(split[0], " ") == "") {
+		split = split[1:]
+	}
+	for _, stri := range split {
+		splitLines := strings.Split(stri, "\n")
+		label := ""
+		//fmt.Println("----")
+		for _, line := range splitLines {
+			//fmt.Println(len(line), line)
+			if (len(line)>1 && line[:1] == "#" && label == "") {
+				label = strings.Trim(line[1:], " ")
+			}
+		}
+		stri =  label + "^" + strings.Join(splitLines, "\n")
+		comms = append(comms, stri)
+	}
+
+	//scriptsSplits := strings.Split(scriptLines, "")
+	//comms = append(comms, split...)
+
 	//fmt.Println(comms)
 	//os.Exit(99)
 	args = os.Args[1:]
