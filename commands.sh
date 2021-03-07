@@ -2,7 +2,7 @@
 ls -lpah --color | awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/)*2^(8-i));if(k)printf("%0o ",k);print}'
 cat /proc/cpuinfo
 # info linux
-printf 'whoami: ';whoami;printf 'uname -a: ';uname -a;lsb_release -a;lscpu | grep 'CPU(s):\\|Model name\\|per socket\\|CPU MHz\\|Vendor ID';awk '$3=="kB"{if ($2>1024^2){$2=$2/1024^2;$3="GB";} else if ($2>1024){$2=$2/1024;$3="MB";}} 1' /proc/meminfo | column -t | grep 'MemTotal\\|MemFree\\|SwapTotal\\|SwapFree'
+printf 'whoami: ';whoami;printf 'uname -a: ';uname -a;lsb_release -a;lscpu | grep "CPU(s):\\|Model name\\|per socket\\|CPU MHz\\|Vendor ID";awk '$3=="kB"{if ($2>1024^2){$2=$2/1024^2;$3="GB";} else if ($2>1024){$2=$2/1024;$3="MB";}} 1' /proc/meminfo | column -t | grep "MemTotal\\|MemFree\\|SwapTotal\\|SwapFree"
 
 # ps linux
 ps -afx
