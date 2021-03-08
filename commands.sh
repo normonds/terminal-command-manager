@@ -47,7 +47,7 @@ find -type f | wc -l
 du -hs <prompt:directory:.>
 # linux app show largest files
 ncdu -x <prompt:directory:/>
-# listen linux opened ports
+# ports listen linux opened
 netstat -plnt | grep LISTEN --color=always
 # linux opened ports sudo
 lsof -i -P -n | grep LISTEN --color=always
