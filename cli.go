@@ -308,7 +308,7 @@ func main() {
 		AddItem(textView, 5, 1, false)
 
 	if err := app.SetRoot(flex, true).EnableMouse(false).Run(); err != nil {
-		panic(err)
+		//panic(err)
 	}
 
 }
