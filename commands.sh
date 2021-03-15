@@ -115,3 +115,5 @@ ffmpeg -loop 1 -framerate 1 -i <prompt:image file> -i <prompt:mp3 file> -c:v lib
 apt-cache show nano | nano -
 # editor
 echo "nano: F1 - help;SHIFT+ALT+4 - toogle word wrap; ALT+U - undo; ALT+N - redo;CTRL+^ - start text mark; CTRL+K - cuts selected text;CTRL+U - paste;F6 - search; ALT+W - repeat search;ALT+C - toogle info box"
+# fzf file browser
+fzf --preview='head -30 {}'
