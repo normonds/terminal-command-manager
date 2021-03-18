@@ -4,9 +4,9 @@ cat /proc/cpuinfo
 # info linux
 printf 'whoami: ';whoami;printf 'uname -a: ';uname -a;lsb_release -a;lscpu | grep "CPU(s):\\|Model name\\|per socket\\|CPU MHz\\|Vendor ID";awk '$3=="kB"{if ($2>1024^2){$2=$2/1024^2;$3="GB";} else if ($2>1024){$2=$2/1024;$3="MB";}} 1' /proc/meminfo | column -t | grep "MemTotal\\|MemFree\\|SwapTotal\\|SwapFree"
 
-# ps linux
+# ps linux processes
 ps -afx
-# top linux
+# top linux processes
 echo "press V tx2 mx2";top -c -E g
 # linux release info
 lsb_release -a
@@ -18,9 +18,6 @@ gcloud projects list
 ibmcloud update; ibmcloud plugin update
 # make active nvm node sudoable
 n=$(which node); n=${n%/bin/node}; chmod -R 755 $n/bin/*; sudo cp -r $n/{bin,lib,share} /usr/local
-
-# kubernetes ibmcloud echo kube config
-kubernetes_config=$(ibmcloud ks cluster-config nooni-cluster --export) && echo;echo $kubernetes_config;echo;
 # kubernetes ibmcloud info
 echo --- NODES ---;kubectl get nodes;echo --- PODS ---;kubectl get pods;echo --- SERVICES ---; kubectl get services
 # kubernetes ibmcloud workers info
@@ -99,6 +96,8 @@ zip <prompt:zipped file:file.zip> <prompt:file to zip:file.txt>
 git log --graph --decorate --pretty=oneline --abbrev-commit
 # github publish
 git push -u origin master
+# commit git add publish
+git add <prompt:directory:.> && git commit -m "<prompt:message:->" && git push <prompt:remote:origin> <prompt:branch:master>
 
 # npm show glob packages
 npm list -g --depth 0
