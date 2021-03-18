@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"strings"
 	// "tview"
-	"github.com/gdamore/tcell"
+	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
 
@@ -215,7 +215,7 @@ func main() {
 	scriptLines := strings.Replace(scripts, "_____single-tick_____", "'", -1)
 	rege := regexp.MustCompile("#!/(usr/bin|bin)/bash")
 	split := rege.Split(scriptLines, -1)
-	if (strings.Trim(split[0], " ") == "") {
+	if strings.Trim(split[0], " ") == "" {
 		split = split[1:]
 	}
 	for _, stri := range split {
@@ -224,11 +224,11 @@ func main() {
 		//fmt.Println("----")
 		for _, line := range splitLines {
 			//fmt.Println(len(line), line)
-			if (len(line)>1 && line[:1] == "#" && label == "") {
+			if len(line) > 1 && line[:1] == "#" && label == "" {
 				label = strings.Trim(line[1:], " ")
 			}
 		}
-		stri =  label + "^" + strings.Join(splitLines, "\n")
+		stri = label + "^" + strings.Join(splitLines, "\n")
 		comms = append(comms, stri)
 	}
 
@@ -263,31 +263,34 @@ func main() {
 		}
 		return
 	}
+
+	//var key tcell.Key
+	//var text string
 	inputField.SetLabel("").SetPlaceholder("").SetFieldWidth(0).
 		//SetAcceptanceFunc(tview.InputFieldInteger).
 		SetChangedFunc(func(text string) {
 			search = inputField.GetText()
 			searchRender(search)
 		}).SetDoneFunc(func(key tcell.Key) {
-		if key == tcell.KeyEnter {
-			app.Stop()
-			// command, _ := list.GetItemText(list.GetCurrentItem())
-			//fmt.Println(len(commsMod))
-			command := commsMod[list.GetCurrentItem()]
-			parseCommand(command)
-		} else if key == tcell.KeyPgDn {
-			list.SetCurrentItem(list.GetCurrentItem() + 20)
-		} else if key == tcell.KeyDown {
-			if list.GetCurrentItem() >= list.GetItemCount()-1 {
-				list.SetCurrentItem(0)
+			if key == tcell.KeyEnter {
+				app.Stop()
+				// command, _ := list.GetItemText(list.GetCurrentItem())
+				//fmt.Println(len(commsMod))
+				command := commsMod[list.GetCurrentItem()]
+				parseCommand(command)
+			} else if key == tcell.KeyPgDn {
+				list.SetCurrentItem(list.GetCurrentItem() + 20)
+			} else if key == tcell.KeyDown {
+				if list.GetCurrentItem() >= list.GetItemCount()-1 {
+					list.SetCurrentItem(0)
+				} else {
+					list.SetCurrentItem(list.GetCurrentItem() + 1)
+				}
+			} else if key == tcell.KeyUp {
+				list.SetCurrentItem(list.GetCurrentItem() - 1)
 			} else {
-				list.SetCurrentItem(list.GetCurrentItem() + 1)
-			}
-		} else if key == tcell.KeyUp {
-			list.SetCurrentItem(list.GetCurrentItem() - 1)
-		} else {
 
-		}
+			}
 	})
 
 	list.ShowSecondaryText(false)
