@@ -78,9 +78,9 @@ curl https://ifconfig.co/port/<prompt:port:8080>
 # nodejs lts install sudo
 curl -sL https://deb.nodesource.com/setup_<prompt:LTS version 10,12,14:14>.x | sudo -E bash - && sudo apt-get install nodejs
 # grep linux search string in files nonbinary recursive caseinsensitive
-grep -rnIi --include \\<prompt:filetype:*.*> "<prompt:search string>" <prompt:directory:.> --color=always | more
+grep -rni<prompt:ignore binary files?:I:> --include <prompt:filetype:*.*> "<prompt:search string>" <prompt:directory:.> <prompt:use less? (else fzf):--color=always | less -r: | fzf>
 # find linux search file
-find <prompt:directory:/home> -iname "*<prompt:string in filenamepath:json>*" -print 2>/dev/null | grep <prompt:string in filenamepath:json> -i --color=always | more
+find <prompt:directory:/home> -iname "*<prompt:string in filenamepath:json>*" -print 2>/dev/null | grep <prompt:string in filenamepath:json> -i <prompt:use less? (else fzf):--color=always | less -r: | fzf>
 # linux append
 echo "<prompt:string>" >> <prompt:filename:file.txt>
 # linux replace text file contents

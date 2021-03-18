@@ -1,7 +1,7 @@
-// Demo code for the List primitive.
 package main
 
 import (
+	"bufio"
 	// "io"
 	// "log"
 	"fmt"
@@ -24,8 +24,9 @@ var app = tview.NewApplication()
 var list = tview.NewList()
 var comms []string
 var commsMod []string
+var isSudoSkippable bool = false
 
-func linesToCommands(stri []string) []string {
+func linesToCommands (stri []string) []string {
 	var r []string
 	var lastComment = ""
 	var appendd = ""
@@ -46,10 +47,10 @@ func linesToCommands(stri []string) []string {
 	}
 	return r
 }
-func RemoveIndex(s []string, index int) []string {
+func RemoveIndex (s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }
-func Find(slice []string, val string) (int, bool) {
+func Find (slice []string, val string) (int, bool) {
 	for i, item := range slice {
 		if item == val {
 			return i, true
@@ -66,7 +67,20 @@ func isRoot() bool {
 	// fmt.Println(string(stdout))
 	return strings.Replace(string(stdout), "\n", "", -1) == "root"
 }
-func parseCommand(command string) {
+func scanInput () string {
+
+	input := bufio.NewScanner(os.Stdin) //Creating a Scanner that will read the input from the console
+
+	for input.Scan() {
+		//fmt.Println("Entered bytes:", input.Bytes())
+		//if input.Text() == "\r" { break } //Break out of input loop when the user types the word "end"
+		//fmt.Println("--" + input.Text())
+		break
+		//return input.Text()
+	}
+	return input.Text()
+}
+func executeCommand (command string) {
 
 	if isRoot() {
 		fmt.Println("\u001b[31mrunning as root\u001b[0m")
@@ -74,16 +88,27 @@ func parseCommand(command string) {
 
 	// check for bash if available
 	useShell := "bash"
+	var labelTagsSL []string
 	lookPath, err := exec.LookPath(useShell)
 	if err != nil {
 		//fmt.Println("bash not found, using shell")
 		useShell = "sh"
 		lookPath, _ = exec.LookPath(useShell)
 	}
-	split := strings.Split(command, "^")
-	if len(split) > 1 {
-		split = RemoveIndex(split, 0)
-		command = strings.Join(split, "^")
+	labelsS := strings.Split(command, "^")
+
+	if len(labelsS) > 1 {
+		labelTagsSL =  strings.Split(labelsS[0], " ")
+		labelsS = RemoveIndex(labelsS, 0)
+		command = strings.Join(labelsS, "^")
+	}
+	_, hasSudo := Find(labelTagsSL, "sudo")
+	if (isSudoSkippable) {
+	} else if (hasSudo && !isRoot()) {
+		fmt.Println("Command: " + command)
+		fmt.Println("Tags: " + strings.Join(labelTagsSL, " "))
+		fmt.Println("\u001B[31mCommand must be executed as root !\u001B[0m")
+		return
 	}
 
 	// find prompts
@@ -108,20 +133,37 @@ func parseCommand(command string) {
 		for i := 0; i < len(promptArr); i++ {
 			stri = strings.Trim(promptArr[i], "<>")
 			strSplit = strings.Split(stri, ":")
+			//useBooleanPrompt := false
 			out = ""
 			read = ""
-
-			//fmt.Print(len(strSplit))
-			fmt.Print(strSplit[1])
-			if len(strSplit) > 2 {
-				fmt.Print(" (" + strSplit[2] + ")")
-			}
-			fmt.Print(": ")
-			_, _ = fmt.Scanln(&read)
-			if read == "" && len(strSplit) > 2 {
-				out = strSplit[2]
+			if len(strSplit) == 4 {
+				//useBooleanPrompt = true
+				fmt.Print(strSplit[1])
+				fmt.Print(" [Y]es\u001B[32m"+
+					//strSplit[2]+
+					"\u001B[0m / [n]o \u001B[31m"+
+					//strSplit[3]+
+					"\u001B[0m: ")
+				_, _ = fmt.Scanln(&read)
+				if (read == "" || strings.ToLower(read) == "y" || strings.ToLower(read) == "yes") {
+					out = strSplit[2]
+				} else {
+					out = strSplit[3]
+				}
+				//fmt.Print(": ")
 			} else {
-				out = read
+				fmt.Print(strSplit[1]) // print info label
+				if len(strSplit) > 2 {
+					fmt.Print(" (" + strSplit[2] + ")") // default value
+				}
+				fmt.Print(": ")
+				_, _ = fmt.Scanln(&read) // wait for user input
+				//read = scanInput()
+				if read == "" && len(strSplit) > 2 { // empty input is default value
+					out = strSplit[2]
+				} else {
+					out = read // set value from input
+				}
 			}
 			//fmt.Println(promptArr[i], out)
 			command = strings.Replace(command, promptArr[i], out, -1)
@@ -132,6 +174,7 @@ func parseCommand(command string) {
 
 	//command = "cat"
 	fmt.Println("\033[33m" + lookPath + ": " + command + "\033[0m")
+
 	cmd := exec.Command(useShell, "-c", command)
 
 	cmd.Stdout = os.Stdout
@@ -159,7 +202,7 @@ func parseCommand(command string) {
 	fmt.Print(string(stdout)) */
 
 }
-func searchRender(search string) {
+func searchRender (search string) {
 	list.Clear()
 	var split []string
 	searchSplit := strings.Split(search, " ")
@@ -205,7 +248,7 @@ func searchRender(search string) {
 		//fmt.Println(comms[i]);
 	}
 }
-func main() {
+func main () {
 
 	removedNewLines := strings.Replace(commsFromFile, "\r\n", "\n", -1)
 
@@ -213,7 +256,7 @@ func main() {
 	comms = linesToCommands(strings.Split(replacedTicks, "\n"))
 
 	scriptLines := strings.Replace(scripts, "_____single-tick_____", "'", -1)
-	rege := regexp.MustCompile("#!/(usr/bin|bin)/bash")
+	rege := regexp.MustCompile("#!/(usr/bin|bin)/(bash|sh)")
 	split := rege.Split(scriptLines, -1)
 	if strings.Trim(split[0], " ") == "" {
 		split = split[1:]
@@ -251,13 +294,17 @@ func main() {
 
 	if len(args) > 0 {
 
+		_, isSudoSkippable = Find(args, "--no-sudo-check")
 		if args[0] == "-v" {
 			fmt.Printf("Build Time: %s\n", buildTime)
 			return
+		} else if (args[0] == "help" || args[0] == "-h") {
+			fmt.Println("Parameters:\n   --no-sudo-check   skip sudo check for commands conatining sudo")
+			fmt.Println("   -v   prints build time")
 		}
 		for i := 0; i < len(comms); i++ {
 			if strings.Index(comms[i], args[0]+" ") == 0 || strings.Index(comms[i], args[0]+"^") == 0 {
-				parseCommand(comms[i])
+				executeCommand(comms[i])
 				break
 			}
 		}
@@ -272,12 +319,15 @@ func main() {
 			search = inputField.GetText()
 			searchRender(search)
 		}).SetDoneFunc(func(key tcell.Key) {
-			if key == tcell.KeyEnter {
+			if key == tcell.KeyEscape {
+				app.Stop()
+			} else if key == tcell.KeyEnter {
 				app.Stop()
 				// command, _ := list.GetItemText(list.GetCurrentItem())
 				//fmt.Println(len(commsMod))
 				command := commsMod[list.GetCurrentItem()]
-				parseCommand(command)
+				executeCommand(command)
+
 			} else if key == tcell.KeyPgDn {
 				list.SetCurrentItem(list.GetCurrentItem() + 20)
 			} else if key == tcell.KeyDown {
