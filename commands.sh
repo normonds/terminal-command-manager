@@ -116,3 +116,5 @@ apt-cache show nano | nano -
 echo "nano: F1 - help;SHIFT+ALT+4 - toogle word wrap; ALT+U - undo; ALT+N - redo;CTRL+^ - start text mark; CTRL+K - cuts selected text;CTRL+U - paste;F6 - search; ALT+W - repeat search;ALT+C - toogle info box"
 # fzf file browser
 fzf --preview='head -30 {}'
+# launcher create desktop shortcut
+printf "[Desktop Entry]\nName=<prompt:App name:gEdit>\nExec=<prompt:path:/usr/bin/gedit>\nIcon=<prompt:icon:/usr/share/icons/Humanity/apps/48/gedit-icon.svg>\nTerminal=<prompt:terminal:false>\nType=Application" > <prompt:shortcut folder:~/Desktop>/<prompt:shortcut name:gEdit>.desktop; chmod +x <prompt:shortcut folder:~/Desktop>/<prompt:shortcut name:gEdit>.desktop
