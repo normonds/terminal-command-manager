@@ -2,6 +2,12 @@ package main
 
 import (
 	"bufio"
+	"crypto/aes"
+	"crypto/cipher"
+	"crypto/md5"
+	"crypto/rand"
+	"encoding/hex"
+	"io"
 	// "io"
 	// "log"
 	"fmt"
@@ -10,7 +16,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	// "tview"
+
 	"github.com/gdamore/tcell/v2"
 	"github.com/rivo/tview"
 )
@@ -26,7 +32,46 @@ var comms []string
 var commsMod []string
 var isSudoSkippable bool = false
 
-func linesToCommands (stri []string) []string {
+func createHash(key string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(key))
+	//fmt.Println(hex.EncodeToString(hasher.Sum(nil)))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
+
+func encrypt(data []byte, passphrase string) []byte {
+	block, _ := aes.NewCipher([]byte(createHash(passphrase)))
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(err.Error())
+	}
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err = io.ReadFull(rand.Reader, nonce); err != nil {
+		panic(err.Error())
+	}
+	ciphertext := gcm.Seal(nonce, nonce, data, nil)
+	return ciphertext
+}
+
+func decrypt(data []byte, passphrase string) []byte {
+	key := []byte(createHash(passphrase))
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		panic(err.Error())
+	}
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		panic(err.Error())
+	}
+	nonceSize := gcm.NonceSize()
+	nonce, ciphertext := data[:nonceSize], data[nonceSize:]
+	plaintext, err := gcm.Open(nil, nonce, ciphertext, nil)
+	if err != nil {
+		panic(err.Error())
+	}
+	return plaintext
+}
+func linesToCommands(stri []string) []string {
 	var r []string
 	var lastComment = ""
 	var appendd = ""
@@ -47,10 +92,10 @@ func linesToCommands (stri []string) []string {
 	}
 	return r
 }
-func RemoveIndex (s []string, index int) []string {
+func RemoveIndex(s []string, index int) []string {
 	return append(s[:index], s[index+1:]...)
 }
-func Find (slice []string, val string) (int, bool) {
+func Find(slice []string, val string) (int, bool) {
 	for i, item := range slice {
 		if item == val {
 			return i, true
@@ -67,7 +112,7 @@ func isRoot() bool {
 	// fmt.Println(string(stdout))
 	return strings.Replace(string(stdout), "\n", "", -1) == "root"
 }
-func scanInput () string {
+func scanInput() string {
 
 	input := bufio.NewScanner(os.Stdin) //Creating a Scanner that will read the input from the console
 
@@ -80,7 +125,7 @@ func scanInput () string {
 	}
 	return input.Text()
 }
-func executeCommand (command string) {
+func executeCommand(command string) {
 
 	if isRoot() {
 		fmt.Println("\u001b[31mrunning as root\u001b[0m")
@@ -98,13 +143,13 @@ func executeCommand (command string) {
 	labelsS := strings.Split(command, "^")
 
 	if len(labelsS) > 1 {
-		labelTagsSL =  strings.Split(labelsS[0], " ")
+		labelTagsSL = strings.Split(labelsS[0], " ")
 		labelsS = RemoveIndex(labelsS, 0)
 		command = strings.Join(labelsS, "^")
 	}
 	_, hasSudo := Find(labelTagsSL, "sudo")
-	if (isSudoSkippable) {
-	} else if (hasSudo && !isRoot()) {
+	if isSudoSkippable {
+	} else if hasSudo && !isRoot() {
 		fmt.Println("Command: " + command)
 		fmt.Println("Tags: " + strings.Join(labelTagsSL, " "))
 		fmt.Println("\u001B[31mCommand must be executed as root !\u001B[0m")
@@ -139,13 +184,13 @@ func executeCommand (command string) {
 			if len(strSplit) == 4 {
 				//useBooleanPrompt = true
 				fmt.Print(strSplit[1])
-				fmt.Print(" [Y]es\u001B[32m"+
+				fmt.Print(" [Y]es\u001B[32m" +
 					//strSplit[2]+
-					"\u001B[0m / [n]o \u001B[31m"+
+					"\u001B[0m / [n]o \u001B[31m" +
 					//strSplit[3]+
 					"\u001B[0m: ")
 				_, _ = fmt.Scanln(&read)
-				if (read == "" || strings.ToLower(read) == "y" || strings.ToLower(read) == "yes") {
+				if read == "" || strings.ToLower(read) == "y" || strings.ToLower(read) == "yes" {
 					out = strSplit[2]
 				} else {
 					out = strSplit[3]
@@ -202,7 +247,7 @@ func executeCommand (command string) {
 	fmt.Print(string(stdout)) */
 
 }
-func searchRender (search string) {
+func searchRender(search string) {
 	list.Clear()
 	var split []string
 	searchSplit := strings.Split(search, " ")
@@ -248,7 +293,7 @@ func searchRender (search string) {
 		//fmt.Println(comms[i]);
 	}
 }
-func main () {
+func main() {
 
 	removedNewLines := strings.Replace(commsFromFile, "\r\n", "\n", -1)
 
@@ -298,9 +343,22 @@ func main () {
 		if args[0] == "-v" {
 			fmt.Printf("Build Time: %s\n", buildTime)
 			return
-		} else if (args[0] == "help" || args[0] == "-h") {
+		} else if args[0] == "help" || args[0] == "-h" {
 			fmt.Println("Parameters:\n   --no-sudo-check   skip sudo check for commands conatining sudo")
 			fmt.Println("   -v   prints build time")
+		} else if args[0] == "encryptaes" && len(args) > 2 {
+			ciphertext := encrypt([]byte(args[2]), args[1])
+			//fmt.Println(ciphertext)
+			fmt.Printf("%x", ciphertext)
+			return
+		} else if args[0] == "decryptaes" && len(args) > 2 {
+			decoded, err := hex.DecodeString(args[2])
+			if err != nil {
+				panic(err.Error())
+			}
+			//fmt.Println(decoded)
+			plaintext := decrypt([]byte(decoded), args[1])
+			fmt.Printf("%s", plaintext)
 		}
 		for i := 0; i < len(comms); i++ {
 			if strings.Index(comms[i], args[0]+" ") == 0 || strings.Index(comms[i], args[0]+"^") == 0 {
@@ -319,28 +377,28 @@ func main () {
 			search = inputField.GetText()
 			searchRender(search)
 		}).SetDoneFunc(func(key tcell.Key) {
-			if key == tcell.KeyEscape {
-				app.Stop()
-			} else if key == tcell.KeyEnter {
-				app.Stop()
-				// command, _ := list.GetItemText(list.GetCurrentItem())
-				//fmt.Println(len(commsMod))
-				command := commsMod[list.GetCurrentItem()]
-				executeCommand(command)
+		if key == tcell.KeyEscape {
+			app.Stop()
+		} else if key == tcell.KeyEnter {
+			app.Stop()
+			// command, _ := list.GetItemText(list.GetCurrentItem())
+			//fmt.Println(len(commsMod))
+			command := commsMod[list.GetCurrentItem()]
+			executeCommand(command)
 
-			} else if key == tcell.KeyPgDn {
-				list.SetCurrentItem(list.GetCurrentItem() + 20)
-			} else if key == tcell.KeyDown {
-				if list.GetCurrentItem() >= list.GetItemCount()-1 {
-					list.SetCurrentItem(0)
-				} else {
-					list.SetCurrentItem(list.GetCurrentItem() + 1)
-				}
-			} else if key == tcell.KeyUp {
-				list.SetCurrentItem(list.GetCurrentItem() - 1)
+		} else if key == tcell.KeyPgDn {
+			list.SetCurrentItem(list.GetCurrentItem() + 20)
+		} else if key == tcell.KeyDown {
+			if list.GetCurrentItem() >= list.GetItemCount()-1 {
+				list.SetCurrentItem(0)
 			} else {
-
+				list.SetCurrentItem(list.GetCurrentItem() + 1)
 			}
+		} else if key == tcell.KeyUp {
+			list.SetCurrentItem(list.GetCurrentItem() - 1)
+		} else {
+
+		}
 	})
 
 	list.ShowSecondaryText(false)
