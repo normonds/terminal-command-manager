@@ -31,6 +31,7 @@ var list = tview.NewList()
 var comms []string
 var commsMod []string
 var isSudoSkippable bool = false
+var commandPrintOnly bool = false
 
 func createHash(key string) string {
 	hasher := md5.New()
@@ -217,15 +218,27 @@ func executeCommand(command string) {
 		//fmt.Print(promptArr)
 	}
 
-	//command = "cat"
-	fmt.Println("\033[33m" + lookPath + ": " + command + "\033[0m")
+	commandPrint := command
+	//skipExecution := false
+	/*if (len(args) > 0 && args[0] == "print") {
+		fmt.Println("\033[33m" + command + "\033[0m")
+		//skipExecution = true
+	} else*/if len(command) > 200 && !commandPrintOnly {
+		commandPrint = command[0:200] + " ... + " + fmt.Sprintf("%d script chars", len(command)-200)
+	}
 
-	cmd := exec.Command(useShell, "-c", command)
+	//if (!skipExecution) {
+	fmt.Println("\033[33m" + lookPath + ": " + commandPrint + "\033[0m")
 
-	cmd.Stdout = os.Stdout
-	cmd.Stdin = os.Stdin
-	cmd.Stderr = os.Stderr
-	_ = cmd.Run()
+	if !commandPrintOnly {
+		cmd := exec.Command(useShell, "-c", command)
+
+		cmd.Stdout = os.Stdout
+		cmd.Stdin = os.Stdin
+		cmd.Stderr = os.Stderr
+		_ = cmd.Run()
+	}
+	//}
 	// fmt.Print
 	/* stdin, err := cmd.StdinPipe()
 	if err != nil {
@@ -326,6 +339,11 @@ func main() {
 	//fmt.Println(comms)
 	//os.Exit(99)
 	args = os.Args[1:]
+	if len(args) > 0 && args[0] == "print" {
+		commandPrintOnly = true
+		args = args[1:]
+		//if len(args) == 0 {args = []string{""}}
+	}
 	list = tview.NewList().SetChangedFunc(func(index int, mainText string, secondaryText string, shortcut rune) {
 		toParse := commsMod[index]
 		if strings.Contains(toParse, "^") {
@@ -340,6 +358,7 @@ func main() {
 	if len(args) > 0 {
 
 		_, isSudoSkippable = Find(args, "--no-sudo-check")
+
 		if args[0] == "-v" {
 			fmt.Printf("Build Time: %s\n", buildTime)
 			return

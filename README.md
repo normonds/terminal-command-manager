@@ -67,3 +67,16 @@ ls -lpah --color | awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/)*2
 ```console
 ln -s /currentdir/cli /usr/bin/yournewcli
 ```
+
+## Syntax
+
+### CLI Arguments
+`print` print next script without running it  
+`-v ` print version
+
+### Script directives
+#### Prompt
+```console
+<prompt:info text[:default value]>
+```
+
