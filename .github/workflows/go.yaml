@@ -30,8 +30,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: 2020.09.12
-          release_name: 2020.09.12
+          tag_name: 2021.09.17
+          release_name: 2021.09.17
           draft: false
           prerelease: false
       - name: Upload Release Asset
