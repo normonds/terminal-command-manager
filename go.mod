@@ -1,6 +1,6 @@
 module github.com/normonds/terminal-command-manager
 
-go 1.16
+go 1.17
 
 require (
 	github.com/gdamore/tcell v1.4.0 // indirect
