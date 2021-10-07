@@ -25,6 +25,7 @@ var args []string
 var buildTime string
 var commsFromFile string
 var scripts string
+var regexBashShebang string = "#!/(usr/bin|bin)/(bash|sh)"
 var textView = tview.NewTextView()
 var app = tview.NewApplication()
 var list = tview.NewList()
@@ -32,6 +33,7 @@ var comms []string
 var commsMod []string
 var isSudoSkippable bool = false
 var commandPrintOnly bool = false
+var isScript bool
 
 func createHash(key string) string {
 	hasher := md5.New()
@@ -227,8 +229,16 @@ func executeCommand(command string) {
 		commandPrint = command[0:200] + " ... + " + fmt.Sprintf("%d script chars", len(command)-200)
 	}
 
-	//if (!skipExecution) {
-	fmt.Println("\033[33m" + lookPath + ": " + commandPrint + "\033[0m")
+	// add shebang back for scripts
+	commandToPrint := "#!" + lookPath + "\n" + strings.TrimSpace(commandPrint)
+	//rege := regexp.MustCompile(regexBashShebang)
+	//splitLines := strings.Split(strings.TrimSpace(commandPrint), "\n")
+	//fmt.Println("commandPrintOnly:", commandPrintOnly)
+	//fmt.Println("splitLines:", splitLines[0], splitLines[1])
+	//ret := rege.Find([]byte(splitLines[0]))
+	//commandToPrint = "#!/bin/bash" + commandToPrint
+
+	fmt.Println("\033[33m" + commandToPrint + "\033[0m")
 
 	if !commandPrintOnly {
 		cmd := exec.Command(useShell, "-c", command)
@@ -314,7 +324,7 @@ func main() {
 	comms = linesToCommands(strings.Split(replacedTicks, "\n"))
 
 	scriptLines := strings.Replace(scripts, "_____single-tick_____", "'", -1)
-	rege := regexp.MustCompile("#!/(usr/bin|bin)/(bash|sh)")
+	rege := regexp.MustCompile(regexBashShebang)
 	split := rege.Split(scriptLines, -1)
 	if strings.Trim(split[0], " ") == "" {
 		split = split[1:]
