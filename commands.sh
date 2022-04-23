@@ -120,3 +120,5 @@ fzf --preview='head -30 {}'
 printf "[Desktop Entry]\nName=<prompt:App name:gEdit>\nExec=<prompt:path:/usr/bin/gedit>\nIcon=<prompt:icon:/usr/share/icons/Humanity/apps/48/gedit-icon.svg>\nTerminal=<prompt:terminal:false>\nType=Application" > <prompt:shortcut folder:~/Desktop>/<prompt:shortcut name:gEdit>.desktop; chmod +x <prompt:shortcut folder:~/Desktop>/<prompt:shortcut name:gEdit>.desktop
 # ubuntu 20.04 desktop icons
 sudo -H gedit /usr/share/gnome-shell/extensions/desktop-icons@csoriano/prefs.js
+# wifi devices
+iw dev
