@@ -98,6 +98,10 @@ git log --graph --decorate --pretty=oneline --abbrev-commit
 git push -u origin master
 # commit git add publish
 git add <prompt:directory:.> && git commit -m "<prompt:message:->" && git push <prompt:remote:origin> <prompt:branch:master>
+#git replace curr dir files with latest remote commit
+git pull origin <prompt:branch:master> && git reset --hard HEAD
+#git squash branch
+git checkout --orphan new-master <prompt:branch:master> && git commit -m "<prompt:message:initial commit>" && git branch -M new-master <prompt:branch:master>
 
 # npm show glob packages
 npm list -g --depth 0
