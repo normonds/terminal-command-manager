@@ -92,18 +92,22 @@ mysqldump --user=<prompt:user:root> --password=<prompt:password:1234> <prompt:da
 # linux
 zip <prompt:zipped file:file.zip> <prompt:file to zip:file.txt>
 
-# git history
+# gitdiff git latest difference
+git show
+# gitpull
+git fetch --all && git pull
+# gitlog
 git log --graph --decorate --pretty=oneline --abbrev-commit
-# github publish
+# gitpush publish
 git push -u origin master
-# commit git add publish
+# gitcommit git add commit publish
 git add <prompt:directory:.> && git commit -m "<prompt:message:->" && git push <prompt:remote:origin> <prompt:branch:master>
-#git replace curr dir files with latest remote commit
+# gitreset replace curr dir files with latest remote commit
 git pull origin <prompt:branch:master> && git reset --hard HEAD
-#git squash branch
+# gitsquashbranch git squash branch
 git checkout --orphan new-master <prompt:branch:master> && git commit -m "<prompt:message:initial commit>" && git branch -M new-master <prompt:branch:master>
 
-# npm show glob packages
+# npm global packages
 npm list -g --depth 0
 # npm show outdated glob packages
 npm outdated -g --depth=0

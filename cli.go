@@ -8,6 +8,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"io"
+
 	// "io"
 	// "log"
 	"fmt"
@@ -205,13 +206,16 @@ func executeCommand(command string) {
 					fmt.Print(" (" + strSplit[2] + ")") // default value
 				}
 				fmt.Print(": ")
-				_, _ = fmt.Scanln(&read) // wait for user input
-				//read = scanInput()
+				//_, _ = fmt.Scanln(&read) // wait for user input
+				read = scanInput()
 				if read == "" && len(strSplit) > 2 { // empty input is default value
+					//fmt.Println("def val")
 					out = strSplit[2]
 				} else {
 					out = read // set value from input
+					//fmt.Println("set value from input")
 				}
+				//fmt.Println("Scanln", read, out)
 			}
 			//fmt.Println(promptArr[i], out)
 			command = strings.Replace(command, promptArr[i], out, -1)
