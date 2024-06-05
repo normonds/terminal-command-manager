@@ -4,6 +4,8 @@ cat /proc/cpuinfo
 # info linux
 printf 'whoami: ';whoami;printf 'uname -a: ';uname -a;lsb_release -a;lscpu | grep "CPU(s):\\|Model name\\|per socket\\|CPU MHz\\|Vendor ID";awk '$3=="kB"{if ($2>1024^2){$2=$2/1024^2;$3="GB";} else if ($2>1024){$2=$2/1024;$3="MB";}} 1' /proc/meminfo | column -t | grep "MemTotal\\|MemFree\\|SwapTotal\\|SwapFree"
 
+# add favourite to ubuntu taskbar
+gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell favorite-apps | sed s/.$//), '<prompt:desktop file in /usr/share/applications:*.desktop>.desktop']"
 # ps linux processes
 ps -afx
 # top linux processes
