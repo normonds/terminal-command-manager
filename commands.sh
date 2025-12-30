@@ -10,7 +10,7 @@ gsettings set org.gnome.shell favorite-apps "$(gsettings get org.gnome.shell fav
 ps -afx
 # top linux processes
 echo "press V tx2 mx2";top -c -E g
-# linux release info
+# release linux info
 lsb_release -a
 
 gcloud components update
@@ -31,36 +31,36 @@ pods=$(kubectl get pods -o name) && pod=$(eval echo $pods | cut -d'/' -f 2) && e
 ls -ahsXp --color
 # ls linux filesystem list files permissions
 ls -lpah --color | awk '{k=0;for(i=0;i<=8;i++)k+=((substr($1,i+2,1)~/[rwx]/)*2^(8-i));if(k)printf("%0o ",k);print}'
-# linux format volume sudo
+# volume linux format sudo
 mkfs -t ext4 /dev/someVolume
 
-# linux filesystem size disks sudo
+# disks filesystem size disks sudo
 fdisk -l
-# linux filesystem size disks
+# disks2 filesystem size disks
 df -h
-# linux filesystem size disks
+# disks3 filesystem size
 lsblk -o NAME,FSTYPE,LABEL,SIZE,UUID,MOUNTPOINT
-# linux filesystem files in current directory
+# size filesystem files in current directory
 find -type f | wc -l
-# linux filesystem current directory size
+# size2 filesystem current directory size
 du -hs <prompt:directory:.>
-# linux app show largest files
+# size3 ncdu app show largest files
 ncdu -x <prompt:directory:/>
-# linux ports listen opened
-netstat -plnt | grep LISTEN --color=always
-# ports linux opened ports sudo
+# ports tcp udp
+netstat --tcp --udp --listening --programs --numeric | grep -i "<prompt:grep:>"
+# ports2 opened ports sudo
 lsof -i -P -n | grep LISTEN --color=always
-# linux system info
+# system info
 lshw -short
-# linux system info cpu
+# cpu system info
 lscpu
-# linux current directory
+# directory current
 pwd
-# linux firewall show iptables sudo
+# iptables linux firewall show  sudo
 iptables -L
-# linux edit sudo (@reboot /path/to/script.sh)
+# crontab linux edit sudo (@reboot /path/to/script.sh)
 crontab -e
-# linux firewall accept all connections for session sudo
+# iptablesaccept linux firewall accept all connections for session sudo
 iptables -P INPUT ACCEPT && iptables -P OUTPUT ACCEPT && iptables -P FORWARD ACCEPT && iptables -F
 # linux systemctl service status
 systemctl status <prompt:service name:cron>
@@ -83,15 +83,17 @@ curl -sL https://deb.nodesource.com/setup_<prompt:LTS version 10,12,14:14>.x | s
 grep -rni<prompt:ignore binary files?:I:> --include <prompt:filetype:*.*> "<prompt:search string>" <prompt:directory:.> <prompt:use less? (else fzf):--color=always | less -r: | fzf>
 # find linux search file
 find <prompt:directory:/home> -iname "*<prompt:string in filenamepath:json>*" -print 2>/dev/null | grep <prompt:string in filenamepath:json> -i <prompt:use less? (else fzf):--color=always | less -r: | fzf>
-# linux append
+# findtext
+ack "<prompt:string in file:"
+# append to file
 echo "<prompt:string>" >> <prompt:filename:file.txt>
-# linux replace text file contents
+# replace text in file
 sed -i "s/<prompt:search string>/<prompt:replace string>/g" <prompt:filename:file.txt>
-# linux show first lines of file
+# head  linux show first lines of file
 head -<prompt:first n lines:30> <prompt:file:file.txt>
 
 mysqldump --user=<prompt:user:root> --password=<prompt:password:1234> <prompt:database> --result-file <prompt:file to save>
-# linux
+# zipnew linux
 zip <prompt:zipped file:file.zip> <prompt:file to zip:file.txt>
 
 # gitdiff git latest difference
@@ -109,9 +111,9 @@ git pull origin <prompt:branch:master> && git reset --hard HEAD
 # gitsquashbranch git squash branch
 git checkout --orphan new-master <prompt:branch:master> && git commit -m "<prompt:message:initial commit>" && git branch -M new-master <prompt:branch:master>
 
-# npm global packages
+# npmglobal packages
 npm list -g --depth 0
-# npm show outdated glob packages
+# npmoutdated glob packages
 npm outdated -g --depth=0
 
 # package info
