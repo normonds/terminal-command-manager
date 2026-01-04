@@ -47,7 +47,7 @@ du -hs <prompt:directory:.>
 # size3 ncdu app show largest files
 ncdu -x <prompt:directory:/>
 # ports tcp udp
-netstat --tcp --udp --listening --programs --numeric | grep -i "<prompt:grep:>"
+netstat --tcp --udp --listening --programs --numeric | grep -i"<prompt:grep:>"  --color=always 
 # ports2 opened ports sudo
 lsof -i -P -n | grep LISTEN --color=always
 # system info
@@ -110,6 +110,22 @@ git add <prompt:directory:.> && git commit -m "<prompt:message:->" && git push <
 git pull origin <prompt:branch:master> && git reset --hard HEAD
 # gitsquashbranch git squash branch
 git checkout --orphan new-master <prompt:branch:master> && git commit -m "<prompt:message:initial commit>" && git branch -M new-master <prompt:branch:master>
+#git remote
+git remote -v
+
+# docker delete all containers
+docker system prune --all --force
+#dockerbash in container
+docker exec -t -i <prompt:container name:node> /bin/bash
+# dockertop
+docker stats
+# dockerstopall containers sudo
+docker stop $(sudo docker ps -a -q)
+# dockerstopall stop all containers sudo
+docker stop $(sudo docker ps -a -q)
+
+# dockerlogs
+sudo docker logs --follow <prompt:container:>
 
 # npmglobal packages
 npm list -g --depth 0
@@ -134,3 +150,7 @@ printf "[Desktop Entry]\nName=<prompt:App name:gEdit>\nExec=<prompt:path:/usr/bi
 sudo -H gedit /usr/share/gnome-shell/extensions/desktop-icons@csoriano/prefs.js
 # wifi devices
 iw dev
+# fail2ban status
+sudo fail2ban-client status sshd
+# gsutil list buckets
+gsutil ls
