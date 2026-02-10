@@ -47,7 +47,7 @@ du -hs <prompt:directory:.>
 # size3 ncdu app show largest files
 ncdu -x <prompt:directory:/>
 # ports tcp udp
-netstat --tcp --udp --listening --programs --numeric | grep -i"<prompt:grep:>"  --color=always 
+netstat --tcp --udp --listening --programs --numeric | grep -i "<prompt:grep:>"  --color=always 
 # ports2 opened ports sudo
 lsof -i -P -n | grep LISTEN --color=always
 # system info
